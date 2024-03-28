@@ -51,7 +51,7 @@ def present_form():
     wealth = get_form_input("Wealth:")
     education = get_form_input("Education:")
 
-    form_answers = [gender,beauty,intelligence,humor,wealth,education]
+    form_answers = [gender, beauty, intelligence, humor, wealth, education]
 
     return form_answers
 
@@ -74,7 +74,10 @@ def grade_attribute(candidate, candicates_dict, attribute):
     for person in candicates_dict:
         if getattr(candicates_dict[person], attribute) > highest_score:
             highest_score = getattr(candicates_dict[person], attribute)
-    score = candidate_attribute / highest_score
+    try:
+        score = candidate_attribute / highest_score
+    except ZeroDivisionError:
+        score = 0
     return score
 
 def grade_candidate(candidate, candidates_dict, form_answers):
@@ -95,11 +98,43 @@ def grade_all_candidates(candidates_dict, form_answers):
         candidates_dict[candidate].grade = grade_candidate(candidates_dict[candidate],candidates_dict,form_answers)
     return candidates_dict
 
+def sort_candidates(candidates_dict):
+    """
+    Creates a sorted dictionary with the 10 highest rated candidates.
+    """
+    sorted_candidates_by_grade = sorted(candidates_dict.items(), key=lambda x: x[1].grade, reverse=True)
+    while len(sorted_candidates_by_grade) > 10:
+        sorted_candidates_by_grade.pop()
+    converted_dict = dict(sorted_candidates_by_grade)
+
+    return converted_dict
+
+def present_top_10_candidates(top_10_candidates_dict):
+    for candidate in top_10_candidates_dict:
+        print("Grade: " + str(top_10_candidates_dict[candidate].grade) + ". " + str(top_10_candidates_dict[candidate]))
+
+def choose_candidate(top_10_candidates_dict):
+    successfull_input = False
+    while not successfull_input:
+        choice = input("What candidate would you like to choose?").strip()
+        try:
+            chosen_candidate = top_10_candidates_dict[choice]
+            successfull_input = True
+            return chosen_candidate
+        except:
+            print("Something went wrong when you typed the name of your chosen candidate.")
+            print("Please try again.")
+
 def main():
     candidates_dict = read_candidates_from_file("candidates.txt") #reads in all the candidates
     form_answers = present_form() #presents the form and gets form answers
     candidates_dict = remove_candidates_of_wrong_gender(form_answers,candidates_dict) #removes all candidates of unwanted gender
     candidates_dict = grade_all_candidates(candidates_dict,form_answers) #grades the candidates
+    top_10_candidates_dict = sort_candidates(candidates_dict)
+    present_top_10_candidates(top_10_candidates_dict)
+    chosen_candidate = choose_candidate(top_10_candidates_dict)
+
+    print("Congratulations! You have chosen " + chosen_candidate.name + "! Great choice!")
 
 
 main()
