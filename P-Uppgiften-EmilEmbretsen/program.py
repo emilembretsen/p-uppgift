@@ -101,6 +101,8 @@ def grade_all_candidates(candidates_dict, form_answers):
 def sort_candidates(candidates_dict):
     """
     Creates a sorted dictionary with the 10 highest rated candidates.
+    This code was created using the same method as described in this FreeCodeCamp
+    article: https://www.freecodecamp.org/news/sort-dictionary-by-value-in-python/
     """
     sorted_candidates_by_grade = sorted(candidates_dict.items(), key=lambda x: x[1].grade, reverse=True)
     while len(sorted_candidates_by_grade) > 10:
@@ -110,31 +112,36 @@ def sort_candidates(candidates_dict):
     return converted_dict
 
 def present_top_10_candidates(top_10_candidates_dict):
+    print("___________________")
+    print("Here are the 10 best candidates for you!")
+
     for candidate in top_10_candidates_dict:
         print("Grade: " + str(top_10_candidates_dict[candidate].grade) + ". " + str(top_10_candidates_dict[candidate]))
 
 def choose_candidate(top_10_candidates_dict):
-    successfull_input = False
-    while not successfull_input:
+    successful_input = False
+    while not successful_input:
         choice = input("What candidate would you like to choose?").strip()
         try:
             chosen_candidate = top_10_candidates_dict[choice]
-            successfull_input = True
+            successful_input = True
             return chosen_candidate
         except:
             print("Something went wrong when you typed the name of your chosen candidate.")
             print("Please try again.")
 
 def main():
+    print("Welcome to the candidate-intermediation program!")
+    print("After answering some questions about your preferences, you will be presented with a list of candidates to choose from.")
+    print("___________________")
     candidates_dict = read_candidates_from_file("candidates.txt") #reads in all the candidates
     form_answers = present_form() #presents the form and gets form answers
     candidates_dict = remove_candidates_of_wrong_gender(form_answers,candidates_dict) #removes all candidates of unwanted gender
     candidates_dict = grade_all_candidates(candidates_dict,form_answers) #grades the candidates
-    top_10_candidates_dict = sort_candidates(candidates_dict)
+    top_10_candidates_dict = sort_candidates(candidates_dict) #sorts and gets the top 10 candidates in a sorted dictionary
     present_top_10_candidates(top_10_candidates_dict)
     chosen_candidate = choose_candidate(top_10_candidates_dict)
 
     print("Congratulations! You have chosen " + chosen_candidate.name + "! Great choice!")
-
 
 main()
